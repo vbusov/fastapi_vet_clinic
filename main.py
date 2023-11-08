@@ -66,21 +66,21 @@ def get_dogs(kind: DogType = None) -> list[Dog]:
 @app.post('/dog')
 def create_dog(dog: Dog) -> Dog:
     if dog.pk in dogs_db:
-        raise HTTPException(status_code=422, detail="Key already exists")
+        raise HTTPException(status_code=409, detail="PK already exists.")
     dogs_db[dog.pk] = dog
     return dog
 
 
 @app.get('/dog/{pk}')
 def get_dog_by_pk(pk: int) -> Dog:
+    if pk not in dogs_db:
+        raise HTTPException(status_code=404, detail="PK doesn't exist.")
     return dogs_db[pk]
 
 
 @app.patch('/dog/{pk}')
 def update_dog(pk: int, dog: Dog) -> Dog:
-    if dog.pk not in dogs_db:
-        raise HTTPException(status_code=422, detail="Key doesn't exist")
     if dog.pk != pk:
-        raise HTTPException(status_code=422, detail="Key mismatch between path and body")
+        raise HTTPException(status_code=409, detail="PK not updateable.")
     dogs_db[pk] = dog
     return dog
